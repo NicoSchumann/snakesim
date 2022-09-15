@@ -12,7 +12,7 @@ public:
     Ground& at(size_t x, size_t y);
 
 private:
-    size_t _widht;
+    size_t _width;
     size_t _height;
     std::vector<Ground> _board;
 

@@ -1,5 +1,5 @@
 all:
-	mkdir build && cd build && cmake ..
+	mkdir -p build && cd build && cmake .. && make
 
 clean:
 	rm -rf build
