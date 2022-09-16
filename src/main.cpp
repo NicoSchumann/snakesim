@@ -2,5 +2,6 @@
 
 int main()
 {
-    return 0;
+    Board board;
+    Simulation(board).run();
 }

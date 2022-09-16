@@ -1,30 +1,15 @@
 #include "Board.hpp"
 
-Point::Point( int xx, int yy) : x{xx}, y{yy} {};
-
-Point operator+(const Point & lhs, const Point & rhs) {
-    return Point(lhs.x+rhs.x, lhs.y+rhs.y);
-}
-Point operator-(const Point & lhs, const Point & rhs) {
-    return Point(lhs.x-rhs.x, lhs.y-rhs.y); 
-}
-
 Board::Board( size_t width, size_t height)
 : _width{width}, _height{height}, _matrix(width*height)
 {}
 
-Board::Board() : Board(20,10) {}
-
-size_t Board::width() const { return _width; }
-size_t Board::height() const { return _height; }
-
-Cell & Board::at( size_t x, size_t y) { return _matrix[x+y*_width]; }
-Cell Board::at(size_t x, size_t y) const{ return _matrix[x+y*_width]; }
 
 std::ostream & operator<<(std::ostream & os, const Cell & cell)
 {
     switch(cell) {
         case Cell::kEmpty: os << "."; break;
+        case Cell::kSnake: os << "S"; break;
         case Cell::kObstacle: os << "X"; break;
         case Cell::kFruit: os << "F"; break;
     }
@@ -37,8 +22,10 @@ std::istream & operator>>(std::istream & is, Cell & cell)
     is >> ch;
     switch(ch) {
         case '.': cell = Cell::kEmpty; break;
+        case 's': cell = Cell::kSnake; break;
         case 'X': cell = Cell::kObstacle; break;
         case 'F': cell = Cell::kFruit; break;
+        default: is.setstate(std::ios_base::failbit);
     }
     return is;
 }
@@ -67,7 +54,7 @@ std::ostream &operator<<(std::ostream &os, const Board &board)
     {
         for( size_t x = 0; x < board.width(); ++x)
         {
-            os << board.at(x,y) << " ";
+            os << board.at(x,y);
         }
         os << "\n";
     }

@@ -3,16 +3,9 @@
 
 #include <vector>
 #include <iostream>
+#include <SFML/System/Vector2.hpp>
 
-struct Point
-{
-    int x, y;
-    Point(int x = 0, int y = 0);
-};
-Point operator+(const Point & lhs, const Point & rhs);
-Point operator-(const Point & lhs, const Point & rhs);
-
-enum class Cell { kEmpty, kObstacle, kFruit };
+enum class Cell { kEmpty, kSnake, kObstacle, kFruit };
 
 std::ostream & operator<<(std::ostream & os, const Cell & cell);
 std::istream & operator>>(std::istream & is, Cell & cell);
@@ -21,23 +14,29 @@ std::istream & operator>>(std::istream & is, Cell & cell);
 class Board
 {
 public:
-    Board(size_t width, size_t height);
-    Board();
+    Board(size_t width = 80, size_t height = 60);
     ~Board() = default;
 
-    inline Cell &at(size_t x, size_t y);
+    inline Cell & at(size_t x, size_t y);
     inline Cell at(size_t x, size_t y) const;
     inline size_t width() const;
     inline size_t height() const;
 
-    std::vector<Point> & getFruits();
+    inline std::vector<sf::Vector2<size_t>> getFruits() const;
 
 private:
     size_t _width;
     size_t _height;
     std::vector<Cell> _matrix;
-    std::vector<Point> _fruits;
+    std::vector<sf::Vector2<size_t>> _fruits;
 };
+
+// declared as inline
+size_t Board::width() const { return _width; }
+size_t Board::height() const { return _height; }
+Cell & Board::at( size_t x, size_t y) { return _matrix[x+y*_width]; }
+Cell Board::at(size_t x, size_t y) const { return _matrix[x+y*_width]; }
+std::vector<sf::Vector2<size_t>> Board::getFruits() const { return _fruits; }
 
 
 std::istream &operator>>(std::istream &is, Board &board);
