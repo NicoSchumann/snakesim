@@ -1,7 +1,7 @@
-#include <Simulation.hpp>
+#include "Game.hpp"
 
 int main()
 {
     Board board;
-    Simulation(board).run();
+    Game(board).run();
 }
