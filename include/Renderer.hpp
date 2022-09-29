@@ -10,7 +10,7 @@
 class Renderer
 {
 public:
-    Renderer( const Board & board, size_t width = 800, size_t height = 600, size_t frameRate = 20);
+    Renderer( const Board & board, size_t width = 800, size_t height = 800, size_t frameRate = 20);
 
     void draw();
     sf::Window & getWindow();

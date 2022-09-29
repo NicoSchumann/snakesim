@@ -1,8 +1,79 @@
+#include <random>
+
 #include "Board.hpp"
+#include "Snake.hpp"
 
 Board::Board( size_t width, size_t height)
 : _width{width}, _height{height}, _matrix(width*height)
-{}
+{
+    spawnFruit();
+}
+
+
+void Board::subscribe(Snake *snake)
+{
+    if (snake != nullptr)
+    {
+        for (auto subscriber : _subscriberList)
+        {
+            if (snake == subscriber)
+            {
+                return; // snake is yet in the subscriber list so do nothing
+            }
+        }
+        _subscriberList.push_back(snake);
+    }
+}
+
+void Board::unsubscribe(Snake *snake)
+{
+    if( snake != nullptr)
+    {
+        for (auto itr = _subscriberList.begin(); itr != _subscriberList.end(); ++itr)
+        {
+            if( *itr == snake)
+            {
+                _subscriberList.erase(itr);
+                return;
+            }
+        }
+    }
+}
+
+void Board::inform() const
+{
+    for( auto subscriber : _subscriberList)
+    {
+        subscriber->inform();
+    }
+}
+
+void Board::spawnFruit()
+{
+    static std::random_device rd;
+    static std::mt19937 reng{rd()};
+    static std::uniform_int_distribution<std::size_t> random_x{0, width()-1};
+    static std::uniform_int_distribution<std::size_t> random_y{0,height()-1};
+
+    while(true)
+    {
+        std::size_t x = random_x(reng);
+        std::size_t y = random_y(reng);
+        if( at(x,y) == Cell::kEmpty)
+        {
+            at(x,y) = Cell::kFruit;
+            _fruit.x = x;
+            _fruit.y = y;
+            inform();
+            return;
+        }
+    }
+}
+
+void Board::fruitEaten()
+{
+    spawnFruit();
+}
 
 
 std::ostream & operator<<(std::ostream & os, const Cell & cell)

@@ -1,22 +1,40 @@
 #include <SFML/Window.hpp>
 #include "Controller.hpp"
+#include "Board.hpp"
+#include <future>
 
-Controller::Controller(sf::Window & win, Snake & snake) 
-: _window(win)
+
+Controller::Controller(Snake & snake, Board & board)
 {
-    _snake = std::move(std::unique_ptr<Snake>(&snake));
+    _snake = std::shared_ptr<Snake>(&snake);
+    _board = std::shared_ptr<Board>(&board);
 }
 
-void Controller::run()
+void Controller::inform()
 {
-    while( _window.isOpen() )
+    _board->fruitEaten();
+}
+
+HumanController::HumanController(sf::Window & win, Snake & snake, Board & board) 
+: Controller(snake, board), _window(win)
+{}
+
+void HumanController::run()
+{
+    std::future<void> snake_ftr = std::async(&Snake::run, _snake);
+
+    // deactivate window's OpenGL context
+    _window.setActive(false);
+
+    while( _window.isOpen() && !_snake->isDead())
     {
-        // blockcs while waiting for an event
+        // blocks while waiting for an event
         while(_window.waitEvent(_event))
         {
             if( _event.type == sf::Event::Closed)
             {
                 _window.close();
+                return;
             }
             else if( _event.type == sf::Event::KeyPressed)
             {
@@ -26,7 +44,7 @@ void Controller::run()
                     case sf::Keyboard::Right:
                     case sf::Keyboard::Up:
                     case sf::Keyboard::Down:
-                        _direction = _event.key.code;
+                        _snake->setDirection(_event.key.code);
                         break;
                     default:
                          ;
@@ -35,6 +53,5 @@ void Controller::run()
         }
 
     }
+    snake_ftr.wait();
 }
-
-sf::Keyboard::Key Controller::getPressedKey() { return _direction; }

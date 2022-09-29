@@ -15,19 +15,25 @@ Game::Game( Board & board)
     head.x = _randomW(_engine);
     head.y = _randomH(_engine);
     _snake = std::make_unique<Snake>(_board, head);
+    _board.at(head.x,head.y) = Cell::kSnake;
 
-    _snakeDisplay = std::make_shared<Renderer>(board); 
-    _controller = std::make_shared<Controller>(_snakeDisplay->getWindow(), *_snake);
+    _renderer = std::make_shared<Renderer>(board); 
+    _humanController = std::make_shared<HumanController>(_renderer->getWindow(), *_snake, _board);
 }
 
 
 void Game::run()
-{
-    std::future<void> ftr = std::async( &Renderer::draw, _snakeDisplay);
-    std::future<void> ftr_controller = std::async(&Controller::run, _controller);
+{  
+    std::future<void> ftr_controller = std::async(&Controller::run, _humanController);
 
-    while( _snakeDisplay->getWindow().isOpen())
+    /// TODO: When ftr_controller terminates, ftr_renderer runs
+    /// still, so it tries to draw to a deleted RenderWindow
+    /// -> seg fault
+    std::future<void> ftr_renderer = std::async( &Renderer::draw, _renderer);
+
+    // terminate when window will closed;
+    while( _renderer->getWindow().isOpen());
 
     ftr_controller.wait();
-    ftr.wait();
+    ftr_renderer.wait();
 }

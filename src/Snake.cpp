@@ -1,18 +1,39 @@
-#include "Snake.hpp"
+#include <chrono>
+#include <thread>
 
+#include "Snake.hpp"
+#include "Board.hpp"
 
 Snake::Snake( Board & board, sf::Vector2<std::size_t> head )
-: _board(board), _grow(false), _size(1)
+: _board(board), _isAlive(true), _grow(false), _size(1), _direction(sf::Keyboard::Key::Down)
 {
     _body.push_back(head);
+    _board.subscribe(this);
 }
+Snake::~Snake() { _board.unsubscribe(this); }
 
 sf::Vector2<std::size_t> & Snake::getHeadPos()
 { 
-    return _body[0]; 
+    return _body[0];
+}
+void Snake::setDirection( sf::Keyboard::Key dir) { _direction = dir; }
+
+void Snake::setDead() { _isAlive = false; };
+bool Snake::isDead() { return !_isAlive; }
+void Snake::run()
+{
+    while(_isAlive) {
+        move(_direction);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
 }
 
-void Snake::move( sf::Keyboard::Key dir )
+void Snake::inform()
+{
+    /// TODO: This should moved to AIcontroller. Here nothing to do.
+}
+
+void Snake::move(sf::Keyboard::Key dir)
 {
     // tail segments should be moved first
     moveTail();

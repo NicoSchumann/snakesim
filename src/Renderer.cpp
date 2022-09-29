@@ -31,22 +31,27 @@ Renderer::Renderer(const Board & board, size_t width, size_t height, size_t fram
 
 void Renderer::draw()
 {
-    while(true) {
-    // clears the buffer
-    _window->clear();
+    // a window cannot be active in more than one thread
+    _window->setActive(true);
 
-    static sf::Vector2f tilePos;
-    for( size_t y = 0; y < _board.height(); ++y)
+    while (_window->isOpen())
     {
-        tilePos.y = _tileEmpty.getSize().y * y;
+        // clears the buffer
+        _window->clear(sf::Color::Black);
 
-        for( size_t x = 0; x < _board.width(); ++x)
+        static sf::Vector2f tilePos;
+        for (size_t y = 0; y < _board.height(); ++y)
         {
-            tilePos.y = _tileEmpty.getSize().x * x;
-            Cell cell = _board.at(x,y);
+            tilePos.y = _tileEmpty.getSize().y * y;
 
-            // draws the Board
-            switch(cell) {
+            for (size_t x = 0; x < _board.width(); ++x)
+            {
+                tilePos.x = _tileEmpty.getSize().x * x;
+                Cell cell = _board.at(x, y);
+
+                // draws the Board
+                switch (cell)
+                {
                 case Cell::kEmpty:
                     _tileEmpty.setPosition(tilePos);
                     _window->draw(_tileEmpty);
@@ -63,15 +68,15 @@ void Renderer::draw()
                     _tileObstacle.setPosition(tilePos);
                     _window->draw(_tileObstacle);
                     break;
-            }
-            
-        } // end for_all x
-    }  // end for_all y
+                }
 
-    // brings the buffer to foreground
-    _window->display();
+            } // end for_all x
+        }     // end for_all y
+
+        // brings the buffer to foreground
+        _window->display();
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000/_frameRate));
- }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000 / _frameRate));
+}
 
 sf::Window & Renderer::getWindow() { return *_window; }

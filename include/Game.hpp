@@ -16,8 +16,8 @@ public:
 
 private:
     Board & _board;
-    std::shared_ptr<Renderer> _snakeDisplay;
-    std::shared_ptr<Controller> _controller;
+    std::shared_ptr<Renderer> _renderer;
+    std::shared_ptr<Controller> _humanController;
 
     std::random_device _dev;
     std::mt19937 _engine;

@@ -9,7 +9,7 @@ file(GLOB SOURCES_TEST "test/test.cpp" "src/Board.cpp" "src/RoutePlanner.cpp" "s
 add_executable(snakesim ${SOURCES})
 add_executable(test ${SOURCES_TEST})
 
-target_link_libraries(snakesim sfml-graphics sfml-system sfml-window)
+target_link_libraries(snakesim sfml-graphics sfml-system sfml-window X11)
 target_compile_options(snakesim PRIVATE -Wall -Wextra)
 
 target_link_libraries(test sfml-graphics sfml-system sfml-window)
